@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VARCO TTS Tester (Lite / Standard)</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <h1>VARCO TTS Tester</h1>
+        <p class="sub">
+          브라우저에서 직접 API를 호출하면 키가 노출될 수 있어, 로컬 서버가 VARCO
+          (NC AI) OpenAPI에 대신 요청합니다.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>설정</h2>
+        <div class="grid">
+          <label class="field">
+            <span>Mode</span>
+            <select id="mode">
+              <option value="lite">lite</option>
+              <option value="standard">standard</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>OPENAPI_KEY</span>
+            <input
+              id="apiKey"
+              type="password"
+              placeholder="키를 입력하세요"
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="actions">
+            <button id="btnLoadVoices" class="primary" type="button">
+              로컬 보이스 새로고침
+            </button>
+            <button id="btnClear" class="ghost" type="button">화면 지우기</button>
+          </div>
+        </div>
+
+        <details class="details">
+          <summary>문서 링크</summary>
+          <ul>
+            <li>
+              Lite:
+              <a
+                href="https://api.varco.ai/ko/docs/voice-text-to-speech-lite"
+                target="_blank"
+                rel="noreferrer"
+                >voice-text-to-speech-lite</a
+              >
+            </li>
+            <li>
+              Standard:
+              <a
+                href="https://api.varco.ai/ko/docs/voice-text-to-speech-standard"
+                target="_blank"
+                rel="noreferrer"
+                >voice-text-to-speech-standard</a
+              >
+            </li>
+          </ul>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>보이스</h2>
+
+        <div class="grid">
+          <label class="field span2">
+            <span>검색</span>
+            <input
+              id="voiceSearch"
+              placeholder="이름/UUID/설명/saas_name 검색"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="field">
+            <span>감정</span>
+            <select id="voiceFilterEmotion"></select>
+          </label>
+
+          <label class="field">
+            <span>성별</span>
+            <select id="voiceFilterGender"></select>
+          </label>
+
+          <label class="field">
+            <span>saas_name</span>
+            <select id="voiceFilterActor"></select>
+          </label>
+
+          <div class="actions">
+            <button id="btnUseFirstVoice" class="ghost" type="button">
+              첫 보이스 사용
+            </button>
+          </div>
+        </div>
+
+        <div id="voiceCount" class="muted" style="margin-top: 10px"></div>
+
+        <div class="row" style="margin-top: 12px">
+          <label class="field grow">
+            <span>voice (UUID)</span>
+            <input id="voice" placeholder="아래 목록에서 선택하세요" />
+          </label>
+          <button id="btnCopyVoice" class="ghost small" type="button">
+            UUID 복사
+          </button>
+        </div>
+
+        <label class="field" style="margin-top: 12px">
+          <span>보이스 목록</span>
+          <select id="voiceSelect"></select>
+        </label>
+
+        <div id="voiceInfo" class="voiceInfo" hidden></div>
+
+        <details class="details" style="margin-top: 12px">
+          <summary>원본 voice.json 보기</summary>
+          <pre id="voicesOut" class="output">(아직 불러오지 않음)</pre>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>합성</h2>
+        <div class="grid">
+          <label class="field span2">
+            <span>text</span>
+            <textarea
+              id="text"
+              rows="4"
+              placeholder="예: 안녕하세요. VARCO 보이스로 텍스트를 합성합니다."
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>language</span>
+            <input id="language" value="korean" />
+          </label>
+
+          <label class="field">
+            <span>speed (0.5~1.5)</span>
+            <input id="speed" type="number" step="0.1" placeholder="기본 1" />
+          </label>
+
+          <label class="field">
+            <span>pitch (0.5~1.5)</span>
+            <input id="pitch" type="number" step="0.1" placeholder="기본 1" />
+          </label>
+
+          <label class="field onlyStandard">
+            <span>n_fm_steps (8~20)</span>
+            <input id="n_fm_steps" type="number" step="1" placeholder="기본 8" />
+          </label>
+
+          <label class="field onlyStandard">
+            <span>seed</span>
+            <input id="seed" type="number" step="1" placeholder="기본 -1" />
+          </label>
+
+          <label class="field">
+            <span>return_metadata</span>
+            <select id="return_metadata">
+              <option value="false" selected>false</option>
+              <option value="true">true</option>
+            </select>
+          </label>
+
+          <div class="actions span2">
+            <button id="btnSynthesize" class="primary" type="button">
+              합성 요청
+            </button>
+          </div>
+        </div>
+
+        <div class="audio">
+          <audio id="player" controls></audio>
+          <a id="download" class="ghost" href="#" download="varco_tts.wav"
+            >다운로드</a
+          >
+        </div>
+
+        <pre id="synthOut" class="output">(아직 요청 없음)</pre>
+      </section>
+
+      <section class="card">
+        <h2>로그</h2>
+        <pre id="log" class="output"></pre>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
